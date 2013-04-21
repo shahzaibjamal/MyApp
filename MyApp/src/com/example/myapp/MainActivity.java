@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import com.google.android.maps.GeoPoint;
+
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -21,6 +21,8 @@ public class MainActivity extends Activity {
 	double currLong;
 	double currLat;
 	TextView textView;
+	public static String add;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,7 +39,7 @@ public class MainActivity extends Activity {
 			try {
 	        	List<Address> addresses = geoCoder.getFromLocation(currLat,currLong, 2);
 	        	
-	        	String add = "Your Location\n";
+	        	add = "Your Location\n";
 	            if (addresses.size() > 0) 
 	            {
 	                for(int j = 1;j<addresses.size();j++)
@@ -57,20 +59,15 @@ public class MainActivity extends Activity {
 	}
 
 	public void onClick(View view){
-	//	Button button = (Button) findViewById(R.id.button1);
-			Intent intent = new Intent(this,Search.class);
-			EditText editText = (EditText) findViewById(R.id.editText1);
-			String destination = editText.getText().toString();
-			intent.putExtra("Destination", destination);
-			intent.putExtra("longitude", String.valueOf(currLong));
-			intent.putExtra("latitude", String.valueOf(currLat));
-			startActivity(intent);
+		
+		//GeoPoint myGeoPoint = new GeoPoint((int)currLat,(int)currLong);
+		Intent intent = new Intent(this,Validate.class);
+		EditText editText = (EditText) findViewById(R.id.editText1);
+		String destination = editText.getText().toString();
+		intent.putExtra("Destination", destination);
+		double[] myCood = {currLat,currLong};
+		intent.putExtra("myCood",myCood);
+		startActivity(intent);
 	}
-	//@Override
-	/*public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-*/
+
 }
