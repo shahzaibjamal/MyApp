@@ -33,7 +33,7 @@ public class GPSValidate extends Service implements LocationListener{
 		getLocation();
 	}
 
-	private Location getLocation(){
+	public Location getLocation(){
 		
 		try{
 			locationManager = (LocationManager)context.getSystemService(LOCATION_SERVICE);
