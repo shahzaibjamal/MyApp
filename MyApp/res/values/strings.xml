@@ -7,6 +7,7 @@
     <string name="Description">Enter Destination</string>
     <string name="FormField"></string>
     <string name="title_activity_search">Search</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_validate">Validate</string>
+    <string name="destination">Show on map</string>
 
 </resources>

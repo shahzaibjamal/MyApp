@@ -5,5 +5,6 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="/home/shahzaib/Downloads/adt-bundle-linux-x86_64-20130219/sdk/extras/android/support/v4/android-support-v4.jar"/>
+	<classpathentry kind="lib" path="libs/google-api-client-1.10.3-beta.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
