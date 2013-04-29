@@ -17,16 +17,11 @@ import com.google.api.client.json.jackson.JacksonFactory;
 @SuppressWarnings("deprecation")
 public class GooglePlaces {
 
-	/** Global instance of the HTTP transport. */
 	private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 
-	// Google API Key
-	private static final String API_KEY = "AIzaSyBk25_lWSJnBSsNu-2_FZZ2pFU1oLjn3Sc"; // place your API key here
+	private static final String API_KEY = "AIzaSyBk25_lWSJnBSsNu-2_FZZ2pFU1oLjn3Sc"; 
 
-	// Google Places serach url's
 	private static final String PLACES_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?";
-//	private static final String PLACES_TEXT_SEARCH_URL = "https://maps.googleapis.com/maps/api/place/search/json?";
-	//private static final String PLACES_DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json?";
 
 	private double _latitude;
 	private double _longitude;
@@ -79,7 +74,7 @@ public class GooglePlaces {
 		return transport.createRequestFactory(new HttpRequestInitializer() {
 			public void initialize(HttpRequest request) {
 				GoogleHeaders headers = new GoogleHeaders();
-				headers.setApplicationName("Places-Test");
+				headers.setApplicationName("MyApp");
 				request.setHeaders(headers);
 				JsonHttpParser parser = new JsonHttpParser(new JacksonFactory());
 				request.addParser(parser);
