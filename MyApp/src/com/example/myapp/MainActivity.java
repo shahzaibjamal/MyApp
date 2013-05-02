@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -38,12 +39,12 @@ public class MainActivity extends Activity {
 		
 		Thread t1 = new Thread(new db());
 		t1.start();
-		try {
-			t1.join();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//			t1.join();
+//		} catch (InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		
 		
 		
@@ -66,10 +67,12 @@ public class MainActivity extends Activity {
 	                	}
 	            }
 	            EditText t = (EditText) findViewById(R.id.editText1);
-	            t.setText("Regal");
+	          //  t.setText("Regal");
+	            t.setTextColor(Color.rgb(255,255,255));
 	            textView = (TextView) findViewById(R.id.TextView2);
 	            textView.setText(add);
 	            textView.setTextSize(20);
+	            textView.setTextColor(Color.rgb(255,255,255));
 	       //     Toast.makeText(getBaseContext(), add, Toast.LENGTH_SHORT).show();
 	         } catch (IOException e) {                
 	                e.printStackTrace();
