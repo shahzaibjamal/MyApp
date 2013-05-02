@@ -6,8 +6,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
-
+    tools:context=".MainActivity"
+    android:background="@drawable/back" >
+    
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -15,7 +16,9 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="28dp"
-        android:text="@string/Description" />
+        android:text="@string/Description"
+        android:textColor="#FFFFFF"
+         />
 
     <TextView
         android:id="@+id/TextView2"
@@ -25,7 +28,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="32dp"
         android:layout_marginLeft="2dp"
-        android:text="asd" />
+        android:text="Cannot get your Location\nCheck your Internet" />
 
     <Button
         android:id="@+id/button1"
@@ -35,8 +38,11 @@
         android:layout_marginTop="72dp"
         android:layout_toRightOf="@+id/textView1"
         android:onClick="onClick"
-        android:text="@string/Search" />
-
+        
+        android:text="@string/Search"
+        android:textColor="#FFFFFF" />
+<!--         android:background="@android:color/white" -->
+    
     <EditText
         android:id="@+id/editText1"
         android:layout_width="150dp"
@@ -46,6 +52,7 @@
         android:layout_alignParentLeft="true"
         android:ems="10"
         android:inputType="text"
+        android:textColor="#FFFFFF"
         android:text="@string/FormField" >
 
         <requestFocus />
