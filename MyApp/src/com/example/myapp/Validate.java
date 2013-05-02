@@ -1,6 +1,7 @@
 package com.example.myapp;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -35,6 +36,10 @@ public class Validate extends Activity {
 	double[] myCood;
 	double[] destinationCood;
 	String result;
+	ArrayList<Match> indexes = new ArrayList<Match>();
+	Match match;
+	TextView textViewBusID;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +49,12 @@ public class Validate extends Activity {
 		String destination = intent.getStringExtra("Destination");
 		myCood = intent.getExtras().getDoubleArray("myCood");
 		textView = (TextView)findViewById(R.id.textView3);
+		textViewBusID = (TextView)findViewById(R.id.textView4);
 		
-//		String returned = intent.getStringExtra("result");
-	
-	//		Log.d("returned result", returned);
 		SearchLocation s = new SearchLocation(destination,this);
 		s.execute();
 		try {
-			String sss = s.get();
+			Match sss = s.get();
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -59,15 +62,15 @@ public class Validate extends Activity {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-			
+
 		Log.d("values returned", result);
-		
+
 		Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
-		
+
 		if(!destination.equals("")){
 			try{
 				List<Address> address = geoCoder.getFromLocationName(destination, 3, 31.386468, 74.149475, 31.612457, 74.420013);
-				
+
 				if(address.size()>0){
 					currLat = address.get(0).getLatitude();
 					currLong = address.get(0).getLongitude();
@@ -82,18 +85,21 @@ public class Validate extends Activity {
 				e.printStackTrace();
 			}
 		}
-	
+
 		destinationCood = new double[2];
 		destinationCood[0] = currLat;
 		destinationCood[1] = currLong;		
+		textViewBusID.setText("Bus ID = "+match.getBusID());
+		textViewBusID.setTextSize(25);
 		textView.setText(destination);
 		textView.setTextSize(15);
 	}
-	
+
 	public void validateOnClick(View view){
 		Intent intent = new Intent(this,Search.class);
 		intent.putExtra("myCood",myCood);
 		intent.putExtra("destinationCood", destinationCood);
+		intent.putExtra("match", match);
 		startActivity(intent);	
 	}
 
@@ -102,21 +108,22 @@ public class Validate extends Activity {
 		getMenuInflater().inflate(R.menu.validate, menu);
 		return true;
 	}
-	
-	 private class SearchLocation extends AsyncTask<Void, Void, String>{
+
+	 private class SearchLocation extends AsyncTask<Void, Void, Match>{
 		    private ProgressDialog progressDialog;
 
 		    DataTest d1;
 		    String destination;
 		    Cursor cursor;
 		    Context context;
-		    
+		    ArrayList<String> bus_name;
 		    SearchLocation(String destination, Context context){
 		    	this.destination = destination;
 		    	result = "";
 		    	this.context = context;
+		    	this.bus_name = new ArrayList<String>();
 		    }
-		    
+
 		    @Override
 		    protected void onPreExecute() {
 		        // TODO Auto-generated method stub
@@ -126,10 +133,44 @@ public class Validate extends Activity {
 		        progressDialog.setIndeterminate(true);
 		        progressDialog.show();
 		    }
-		    
+
 		    @Override
-		    protected String doInBackground(Void... params) {
+		    protected Match doInBackground(Void... params) {
 		    	d1 = new DataTest(Validate.this);
+
+		    	bus_name.add("B-1");
+		    	bus_name.add("B-2");
+		    	bus_name.add("B-4");
+		    	bus_name.add("B-5");
+		    	bus_name.add("B-7");
+		    	bus_name.add("B-8");
+		    	bus_name.add("B-10");
+		    	bus_name.add("B-11");
+		    	bus_name.add("B-12");
+		    	bus_name.add("B-12A");
+		    	bus_name.add("B-14");
+		    	bus_name.add("B-16");
+		    	bus_name.add("B-17");
+		    	bus_name.add("B-18");
+		    	bus_name.add("B-19");
+		    	bus_name.add("B-20");
+		    	bus_name.add("B-21");
+		    	bus_name.add("B-22");
+		    	bus_name.add("B-23");
+		    	bus_name.add("B-24");
+		    	bus_name.add("B-26");
+		    	bus_name.add("B-28");
+		    	bus_name.add("B-33");
+		    	bus_name.add("B-37-49-A");
+		    	bus_name.add("B-41");
+		    	bus_name.add("B-42");
+		    	bus_name.add("B-43");
+		    	bus_name.add("B-49");
+		    	bus_name.add("B-51");
+		    	bus_name.add("B-53");
+		    	bus_name.add("B-54");
+		    	bus_name.add("B-56");
+		    	
 		    	
 		    	int destinationLength;
 		    	int dataLength;
@@ -141,75 +182,126 @@ public class Validate extends Activity {
 				}catch(Exception e){
 					e.printStackTrace();
 				}
-		    	int distance = -1;
-		    	double max = -5;
-		    	int index = -1;
-		    	double div = -.01;
+//		    	int index = -1;
 		    	SQLiteDatabase db = d1.openDataBase();
-		    	//SQLiteDatabase db = d1.getInstance();
-		    	
-		    	
-		    	
-		    	System.out.println(DatabaseUtils.queryNumEntries(db,"route"));
-		    	
-		    	for(int i = 1;i<18;i++){
-		    		cursor = db.query("route", new String[] { "_id","bus_number","source","destination"}, "_id=?",
+		    	long size = DatabaseUtils.queryNumEntries(db,"route");
+			    //	System.out.println(size);
+			    	
+//			    	Match match;
+			    	String temp1 = destination.toLowerCase();
+			    	destinationLength = destination.length();
+			   
+			    	String index = null;
+			    	String busID = null;
+			    	
+			    	boolean flag = false;
+			    	
+		    	for(int i = 1;i<bus_name.size();i++){
+		    		cursor = db.query("route", new String[] { "_id","bus_number","source","destination","lat","long"}, "_id=?",
 		    				new String[]{String.valueOf(i)}, null, null, null, null);
-		    		if (cursor != null)
-		    			cursor.moveToFirst();
+		    		int distance = -1;
+			    	double max = -5;
+			    	double div = -.01;
 		    		
-		    		String a = cursor.getString(2);
-		    		String temp1 = destination.toLowerCase();
-		    		String temp2 = a.toLowerCase();
-		    		distance = computeLevenshteinDistance(temp1,temp2);
-		    		
-		    		destinationLength = destination.length();
-		    		dataLength = a.length();
-		    		
-		    		if(distance != 0){
-		    			div = (((dataLength-distance)/distance)*dataLength);
+		    		while(cursor.moveToNext()){
+		    			String a = cursor.getString(2);
+		    			
+		    			String temp2 = a.toLowerCase();
+		    			distance = computeLevenshteinDistance(temp1,temp2);
+		    						
+		    			dataLength = a.length();
+		    			
+	    				if(distance != 0){
+	    					div = (dataLength-distance);
+	    					div = div/distance*dataLength;
+	    				}
+
+	    				if(distance == 0){
+	    					index = cursor.getString(0);
+	    					busID = cursor.getString(1);
+	    					match = new Match(index,busID,max);
+		    				indexes.add(match);
+	    					
+		    			}else if(destinationLength < dataLength  && max < div){ 
+		    				max = div;
+		    				index = cursor.getString(0);
+	    					busID = cursor.getString(1);
+	    					flag = true;
+	    					//System.out.println(busID + " location " + a+ " index = "+ index);
+						}
 		    		}
 		    		
-		    		System.out.println(a + " location "+ distance+ " distance " + " div " +div);
+		    		if(flag){
+		    			match = new Match(index,busID,max);
+        				indexes.add(match);
+        				flag = false;
+		    		}		    	
 		    		
-		    		if(destinationLength < dataLength  && max < div){
-		    			max = div;
-		    			index = i;
-		    			System.out.println(div + " location " + a);
-		    		}
-		    		if(distance == 0){
-		    			index = i;
-		    		}
 		    	}
 		    	
-		    	if(index != -1){
-		    		cursor = db.query("route", new String[] { "_id","bus_number","source","destination"}, "_id=?",
-		    				new String[]{String.valueOf(index)}, null, null, null, null);
-		    		if (cursor != null)
-		    			cursor.moveToFirst();
+		    	double tempLat;
+				double tempLong;	    	
+				int indexLast = -1;
+		    	String indexFinish = null;
+		    	
+		    	double max = -5;
+		    	double tempMax;
+		    	
+		    	for(int z = 0;z<indexes.size();z++){
+
+		    		cursor = db.query("route", new String[] { "_id","bus_number","source","destination","lat","long"}, "bus_number=?",
+							new String[]{String.valueOf(indexes.get(z).getBusID())}, null, null, null, null);
 		    		
-		    		result = cursor.getString(2);
+			    	double minLat=5.0;
+			    	double minLong = 5.0;
+
+		    		tempMax = indexes.get(z).div;
+    				//System.out.println(tempMax +" tempMax"+indexes.get(z).getBusID()+  " busid");
+		    		if(max < tempMax){
+    					flag = true;
+    					max = tempMax;
+    					System.out.println(max+ " only max");
+    				}
+    				
+		    		while(cursor.moveToNext()){			
+		    			if(cursor.getString(4)!=null){
+		    				tempLat = Math.abs(Double.parseDouble(cursor.getString(4))-myCood[0]);	
+		    				tempLong = Math.abs(Double.parseDouble(cursor.getString(5))-myCood[1]);
+		    					
+		    					if(tempLat < minLat && tempLong < minLong && flag){
+		    						minLat = tempLat;
+		    						minLong = tempLong;
+		    			
+		    						indexFinish = cursor.getString(0);
+		    						indexes.get(z).setIndexFinish(indexFinish);
+		    						indexLast = z;
+		    						System.out.println(max +" max "+ indexFinish);
+		    					}
+		    				
+		    			}
+				    }
+		    		flag = false;
+	
 		    	}
-		    	db.close();
-		    	if(!result.equals("")){
-		    		Log.d("return ","return value contained " + result);
-		    		return result;
-		    		
-		    	}else{
-		    		Log.d("not return","null");
-		    		
-		    		return null;
-		    	}
+		    	
+//		    	System.out.println(indexLast + " "+ indexes.get(indexLast).getIndexFinish());
+		    	match = indexes.get(indexLast);
+		    	System.out.println(match.getBusID()+" start "+match.getIndexStart() + " finish "+ match.getIndexFinish());
+		    	return match;
+
+	
+		    
+		    
 		    }
 		    @Override
-		    protected void onPostExecute(String result1) {
+		    protected void onPostExecute(Match result1) {
 		        progressDialog.dismiss();
-		        result = result1;
+//		        result = result1;
 		        super.onPostExecute(result1);   
 
 		    }
 		}
-	 
+
 	 private int minimum(int a, int b, int c) {
          return Math.min(Math.min(a, b), c);
 	 }
@@ -234,9 +326,9 @@ public class Validate extends Activity {
          return distance[str1.length()][str2.length()];
  }
 
-	 
-	 
-	
-	
+
+
+
+
 
 }
