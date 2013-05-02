@@ -43,21 +43,23 @@ public class Search extends Activity {
 	LatLng myPos;
 	LatLng myCoodSearchPlace;
 	ArrayList<String> wayPoints = new ArrayList<String>();
-	
+	Match match;
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-		
+
 		Intent intent = getIntent();
-		
+
 		double[] myCood = intent.getExtras().getDoubleArray("myCood");
 		double[] destinationCood = intent.getExtras().getDoubleArray("destinationCood");
+		match = (Match)intent.getSerializableExtra("match");
 		currLat = myCood[0];
 		currLong = myCood[1];
-	
-		
+
+
 		myCoodSearchPlace = new LatLng(currLat,currLong);
 		SearchPlace place = new SearchPlace(myCoodSearchPlace);
 		place.execute();
@@ -70,37 +72,37 @@ public class Search extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		if(nearPlaces!=null){
 			currLat = nearPlaces.results.get(0).geometry.location.lat;
 			currLong = nearPlaces.results.get(0).geometry.location.lng;
 		}
-	
+
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 		myPos = new LatLng(currLat,currLong);
-		
+
 		LatLng desPos = new LatLng(destinationCood[0],destinationCood[1]);
-		
+
 		BitmapDescriptor yourImage = BitmapDescriptorFactory.fromResource(R.drawable.bluedot);
 
-		
+
 		Marker myMarker = map.addMarker(new MarkerOptions().position(myCoodSearchPlace).title("You").icon(yourImage));
 		Marker BusMarker = map.addMarker(new MarkerOptions().position(myPos).title("Nearest BusStop"));
 		Marker desMarker = map.addMarker(new MarkerOptions().position(desPos).title("destination!!"));
 
-		for(int x = 0;x<=8;x++){
+		for(int x = 0;x<wayPoints.size();x++){
 			String[] splits = wayPoints.get(x).split(",");
 			LatLng wayPos = new LatLng(Double.valueOf(splits[1]),Double.valueOf(splits[2]));
 			Marker wayPointMarker = map.addMarker(new MarkerOptions().position(wayPos).title(splits[0]));
 		}
-		
+
 		String test = makeURL(currLat,currLong,destinationCood[0],destinationCood[1],wayPoints);
-		
+
 		new connectAsyncTask(test).execute();
-		
+
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(myPos, 15));
 		map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
-		
+
 	}
 
 	@Override
@@ -109,10 +111,10 @@ public class Search extends Activity {
 		getMenuInflater().inflate(R.menu.search, menu);
 		return true;
 	}
-	
+
 	 public String makeURL (double sourcelat, double sourcelog, double destlat, 
 			 double destlog,ArrayList<String> wayPoints){
-	        
+
 		 StringBuilder urlString = new StringBuilder();
 	        urlString.append("http://maps.googleapis.com/maps/api/directions/json");
 		 	urlString.append("?origin=");// from
@@ -125,11 +127,11 @@ public class Search extends Activity {
 	                .append(Double.toString( destlat));
 	        urlString.append(",");
 	        urlString.append(Double.toString( destlog));
-	        
-	        
+
+
 	        ///////////////////////////////////////////////
 	        	urlString.append("&waypoints=");// to		//correct one but illegal url
-	        for(int i = 0;i<=6;i++){
+	        for(int i = 0;i<wayPoints.size();i++){
 	        	String temp = wayPoints.get(i);
 	        	String[] splits =  temp.split(",");
 	        	urlString.append(splits[1]+","+splits[2]);
@@ -149,10 +151,10 @@ public class Search extends Activity {
 //			String a = newURL + URL;
 //			System.out.println(a);
 //	        return a;
-	        
+
 	        return urlString.toString();
 	 }
-	 
+
 	 public void drawPath(String result) {
 
 		    try {
@@ -165,15 +167,15 @@ public class Search extends Activity {
 		           List<LatLng> list = decodePoly(encodedString);
 
 //		           System.out.println(myCood);
-		           
+
 		           LatLng myLatLng= myCoodSearchPlace;
 	                LatLng dest1= list.get(0);
 	                Polyline firstLine = map.addPolyline(new PolylineOptions()
 	                .add(new LatLng(myLatLng.latitude, myLatLng.longitude), new LatLng(dest1.latitude,dest1.longitude))
 	                .width(2)
 	                .color(Color.BLUE).geodesic(true));
-		           
-		           
+
+
 		           for(int z = 0; z<list.size()-1;z++){
 		                LatLng src= list.get(z);
 		                LatLng dest= list.get(z+1);
@@ -187,8 +189,8 @@ public class Search extends Activity {
 		    	e.printStackTrace();
 		    }
 		}
-	
-	 
+
+
 	 private List<LatLng> decodePoly(String encoded) {
 
 		    List<LatLng> poly = new ArrayList<LatLng>();
@@ -221,7 +223,7 @@ public class Search extends Activity {
 		    }
 		    return poly;
 		}
-	
+
 	 private class connectAsyncTask extends AsyncTask<Void, Void, String>{
 		    private ProgressDialog progressDialog;
 		    String url;
@@ -252,14 +254,14 @@ public class Search extends Activity {
 		        }
 		    }
 		}
-	 
+
 	 private class SearchPlace extends AsyncTask<Void, Void, PlacesList>{
 		    private ProgressDialog progressDialog;
 		    LatLng desCood;
 		    PlacesList newList;
 		    DataTest d1;
 		    SQLiteDatabase db;
-		    
+
 		    SearchPlace(LatLng desCood){
 		    	this.desCood = desCood;
 		    	d1 = new DataTest(Search.this);
@@ -278,38 +280,45 @@ public class Search extends Activity {
 		    protected PlacesList doInBackground(Void... params) {
 		    		googlePlaces = new GooglePlaces();
 		    		Cursor cursor;
-		    		
-		    		long numRows = DatabaseUtils.queryNumEntries(db,"route");
-		    		
-		    		
-		    		for(int i = 1;i<=numRows;i++){
-		    			
+		    		System.out.println("helloooo");
+		    		System.out.println(match.getIndexStart()+" indexes "+match.getIndexFinish());
+		    		int start = Integer.parseInt(match.getIndexStart());
+		    		int finish = Integer.parseInt(match.getIndexFinish());
+		    		System.out.println(start+" "+finish);
+		    		if(start>=finish){
+		    			int temp = start;
+		    			start = finish;
+		    			finish = temp;
+		    		}
+
+		    		for(int i = start;i<=finish;i++){
+
 		    			cursor = db.query("route", new String[] { "_id","bus_number","source","destination",
 		    					"lat","long"}, "_id=?",
 		    					new String[]{String.valueOf(i)}, null, null, null, null);
 		    				if (cursor != null)
 		    					cursor.moveToFirst();
-		    				
+
 		    				if(cursor.isNull(4) || cursor.isNull(5)){
-		    					
+
 		    				}else{
 		    					String waypoint = cursor.getString(2)+","+cursor.getString(4)+"," + cursor.getString(5);
 		    					wayPoints.add(waypoint);
 		    				}
-		    				
+
 		    		}
-		    		
+
 		    		try {
 		    			String types = "bus_station"; // Listing places only bus stations
-					
+
 					// Radius in meters - increase this value if you don't find any places
 		    			double radius = 1000; // 1000 meters
-					
+
 					// get nearest places
 		    			nearPlaces = googlePlaces.search(desCood.latitude,desCood.longitude, radius, types);
 		    			newList = googlePlaces.search(desCood.latitude,desCood.longitude, radius, types);
-		    			
-					
+
+
 		    		} catch (Exception e) {
 		    			e.printStackTrace();
 		    		}
@@ -323,5 +332,5 @@ public class Search extends Activity {
 
 		    }
 		}
-	 
+
 }
